@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery | Cristian's Work</title>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            var(--bg-dark): #0f172a;
+            var(--bg-card): #1e293b;
+            var(--neon-green): #39FF14;
+            var(--neon-glow): rgba(57, 255, 20, 0.3);
+            var(--text-main): #f8fafc;
+            var(--text-dim): #94a3b8;
+            var(--transition-speed): 0.3s;
+        }
+
+        /* --- Page Transition Styles --- */
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            margin: 0;
+            background-color: #0f172a;
+            color: #f8fafc;
+            overflow: hidden; /* Prevent scrolling, acts like an app */
+            
+            animation: pageEnter 0.5s ease forwards;
+            opacity: 1;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            display: flex;
+            height: 100vh;
+        }
+
+        @keyframes pageEnter {
+            from { opacity: 0; transform: scale(1.05); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        body.page-exit {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+        /* --- MAGIC SIDEBAR STYLES --- */
+        .sidebar {
+            position: relative;
+            z-index: 10;
+            width: 80px; /* Collapsed width */
+            height: 100vh;
+            background: #1e293b;
+            border-right: 2px solid #39FF14;
+            box-shadow: 5px 0 25px rgba(57, 255, 20, 0.2);
+            transition: width 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .sidebar:hover {
+            width: 280px; /* Expanded width */
+        }
+
+        .sidebar-header {
+            padding: 30px 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(57, 255, 20, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header i {
+            color: #39FF14;
+            font-size: 2rem;
+            text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+        }
+
+        .menu-category {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 10px 20px;
+            margin-top: 10px;
+            opacity: 0; /* Hidden when collapsed */
+            transition: opacity 0.3s;
+        }
+
+        .sidebar:hover .menu-category {
+            opacity: 1;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #f8fafc;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: rgba(57, 255, 20, 0.1);
+            border-left-color: #39FF14;
+            color: #39FF14;
+        }
+
+        .menu-item i {
+            font-size: 1.5rem;
+            min-width: 40px; /* Keeps icons aligned */
+            text-align: center;
+        }
+
+        .menu-text {
+            margin-left: 15px;
+            font-weight: bold;
+            font-size: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .sidebar:hover .menu-text {
+            opacity: 1;
+        }
+
+        /* --- MAIN CONTENT & SLIDESHOW --- */
+        .content-area {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            color: #39FF14;
+            text-decoration: none;
+            font-weight: bold;
+            border: 1px solid #39FF14;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .back-btn:hover {
+            background: #39FF14;
+            color: #000;
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
+        }
+
+        #gallery-title {
+            color: #39FF14;
+            font-size: 2.5rem;
+            margin: 0;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+        }
+
+        /* Slideshow Container */
+        .slideshow-container {
+            flex: 1;
+            position: relative;
+            background: rgba(30, 41, 59, 0.8);
+            border: 2px solid #39FF14;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(57, 255, 20, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Keeps whole image visible */
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        /* Slide Controls */
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(15, 23, 42, 0.8);
+            color: #39FF14;
+            border: 1px solid #39FF14;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            border-radius: 5px;
+            transition: 0.3s;
+            z-index: 5;
+        }
+
+        .nav-btn:hover {
+            background: #39FF14;
+            color: #000;
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
+        }
+
+        .prev-btn { left: 20px; }
+        .next-btn { right: 20px; }
+
+        /* No Images Indicator */
+        .no-images {
+            color: #94a3b8;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="particles-js"></div>
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-fingerprint"></i>
+        </div>
+
+        <div class="menu-category">Design Work</div>
+        <div class="menu-item active" onclick="loadGallery('tshirt', 'T-Shirt Designs', this)">
+            <i class="fas fa-tshirt"></i>
+            <span class="menu-text">T-Shirt Design</span>
+        </div>
+        <div class="menu-item" onclick="loadGallery('tarpaulin', 'Tarpaulin Designs', this)">
+            <i class="fas fa-scroll"></i>
+            <span class="menu-text">Tarpaulin Design</span>
+        </div>
+        <div class="menu-item" onclick="loadGallery('graphics', 'Graphics Design', this)">
+            <i class="fas fa-palette"></i>
+            <span class="menu-text">Graphics Design</span>
+        </div>
+
+        <div class="menu-category">IT Operations</div>
+        <div class="menu-item" onclick="loadGallery('cctv', 'CCTV Maintenance', this)">
+            <i class="fas fa-video"></i>
+            <span class="menu-text">CCTV Systems</span>
+        </div>
+        <div class="menu-item" onclick="loadGallery('network', 'Network Infrastructure', this)">
+            <i class="fas fa-network-wired"></i>
+            <span class="menu-text">The Network</span>
+        </div>
+    </nav>
+
+    <main class="content-area">
+        <div class="top-bar">
+            <h1 id="gallery-title">T-Shirt Designs</h1>
+            <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Main System</a>
+        </div>
+
+        <div class="slideshow-container">
+            <button class="nav-btn prev-btn" onclick="changeSlide(-1)"><i class="fas fa-chevron-left"></i></button>
+            
+            <div id="slide-wrapper" style="width: 100%; height: 100%; position: relative;"></div>
+            
+            <div class="no-images" id="no-img-text">System Error: No images found in directory.</div>
+
+            <button class="nav-btn next-btn" onclick="changeSlide(1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // --- 1. YOUR GALLERY DATABASE ---
+        // Just add the exact filenames of your pictures into these lists!
+        const galleryData = {
+            tshirt: [
+                "PIC/tshirt/shirt1.jpg", 
+                "PIC/tshirt/shirt2.jpg"
+            ],
+            tarpaulin: [
+                "PIC/tarp/tarp1.jpg"
+            ],
+            graphics: [
+                "PIC/gfx/design1.jpg",
+                "PIC/gfx/design2.jpg"
+            ],
+            cctv: [
+                "PIC/cctv/cam1.jpg",
+                "PIC/cctv/cam2.jpg",
+                "PIC/cctv/dvr.jpg"
+            ],
+            network: [
+                "PIC/network/router1.jpg",
+                "PIC/network/cables.jpg"
+            ]
+        };
+
+        // --- 2. SLIDESHOW LOGIC ---
+        let currentSlideIndex = 0;
+        let slideTimer;
+        let currentArray = [];
+
+        function loadGallery(categoryKey, titleText, element) {
+            // Update UI Menu Active State
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            if(element) element.classList.add('active');
+
+            // Update Title
+            document.getElementById('gallery-title').innerText = titleText;
+
+            // Load new images
+            currentArray = galleryData[categoryKey];
+            const wrapper = document.getElementById('slide-wrapper');
+            const noImgText = document.getElementById('no-img-text');
+            wrapper.innerHTML = ''; // Clear old images
+
+            if (currentArray.length === 0) {
+                noImgText.style.display = 'block';
+                return;
+            } else {
+                noImgText.style.display = 'none';
+            }
+
+            // Create Image Tags
+            currentArray.forEach((src, index) => {
+                let img = document.createElement('img');
+                img.src = src;
+                img.className = index === 0 ? 'slide active' : 'slide';
+                wrapper.appendChild(img);
+            });
+
+            currentSlideIndex = 0;
+            resetAutoSlide();
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.slide');
+            if(slides.length === 0) return;
+
+            slides[currentSlideIndex].classList.remove('active');
+            
+            currentSlideIndex += direction;
+            
+            // Loop back around
+            if (currentSlideIndex >= slides.length) currentSlideIndex = 0;
+            if (currentSlideIndex < 0) currentSlideIndex = slides.length - 1;
+
+            slides[currentSlideIndex].classList.add('active');
+            resetAutoSlide(); // Reset timer so it doesn't auto-slide right after you click
+        }
+
+        function resetAutoSlide() {
+            clearInterval(slideTimer);
+            slideTimer = setInterval(() => {
+                changeSlide(1);
+            }, 4000); // Changes image every 4 seconds
+        }
+
+        // --- 3. INITIALIZATION ---
+        // Start particles
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#39FF14" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.2, "random": false },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": true, "distance": 150, "color": "#39FF14", "opacity": 0.3, "width": 1 },
+                "move": { "enable": true, "speed": 1.5, "direction": "none", "out_mode": "out" }
+            },
+            "interactivity": {
+                "events": { "onhover": { "enable": true, "mode": "grab" } },
+                "modes": { "grab": { "distance": 200, "line_linked": { "opacity": 0.8 } } }
+            }
+        });
+
+        // Load the first category on startup
+        window.onload = () => {
+            loadGallery('tshirt', 'T-Shirt Designs', document.querySelector('.menu-item'));
+        };
+
+        // --- 4. PAGE TRANSITION LOGIC ---
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const target = this.getAttribute('href');
+                if (target && !target.startsWith('#') && !target.startsWith('http')) {
+                    e.preventDefault(); 
+                    document.body.classList.add('page-exit'); 
+                    setTimeout(() => {
+                        window.location.href = target;
+                    }, 400); 
+                }
+            });
+        });
+    </script>
+</body>
+</html>
