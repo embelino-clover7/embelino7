@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -33,12 +32,10 @@
             color: var(--text-main);
             line-height: 1.6;
             overflow-x: hidden;
-            /* Added for smooth transition */
             opacity: 1;
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
-        /* The class triggered by JavaScript before leaving the page */
         body.page-exit {
             opacity: 0;
             transform: scale(0.95);
@@ -88,9 +85,24 @@
             gap: 8px;
         }
         
+        /* New Label Style */
+        .contact-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+            margin-right: 5px;
+            font-weight: 400;
+            transition: var(--transition-speed);
+        }
+
         .phone-link:hover {
             text-shadow: 0 0 15px var(--neon-glow);
             color: #fff;
+        }
+
+        .phone-link:hover .contact-label {
+            color: var(--text-main);
+            text-shadow: 0 0 8px var(--neon-glow);
         }
 
         .social-icons {
@@ -114,7 +126,6 @@
             text-shadow: 0 0 10px var(--neon-glow);
         }
 
-        /* Custom Neon Tooltip */
         .social-link::after {
             content: attr(data-name);
             position: absolute;
@@ -142,7 +153,6 @@
             bottom: -40px; 
         }
         
-        /* Mobile adjustment for contact bar */
         @media (max-width: 768px) {
             .top-contact-bar {
                 top: 15px;
@@ -528,6 +538,7 @@
         
         <div class="top-contact-bar" data-aos="fade-down" data-aos-delay="800">
             <a href="tel:09283189309" class="phone-link">
+                <span class="contact-label">CONTACT ME:</span>
                 <i class="fas fa-phone-alt"></i> 09283189309
             </a>
             <div class="social-icons">
@@ -550,7 +561,7 @@
             <h1 data-aos="zoom-in">Cristian T. Embelino</h1>
             <div class="subtitle" data-aos="fade-up" data-aos-delay="200">IT Specialist | Career Service Pro</div>
             <p class="hero-text" data-aos="fade-up" data-aos-delay="400">
-                Executing hands-on network administration—from installing routers and switches to meticulous CCTV and hardware maintenance—operating daily with the exactness of a licensed professional and the uncompromising integrity of a servant.
+                Executing hands-on network administration from installing routers and switches to meticulous CCTV and hardware maintenance operating daily with the exactness of a licensed professional and the uncompromising integrity of a servant.
             </p>
             <div class="button-group" data-aos="fade-up" data-aos-delay="600">
                 <a href="about.html" class="btn btn-primary">About Me</a>
@@ -672,7 +683,6 @@
             "retina_detect": true
         });
 
-        // --- Unified Bubble Pop-up Logic ---
         const bubbleSetups = [
             { triggerId: 'csc-trigger', bubbleId: 'csc-bubble', closeBtnId: 'close-csc-bubble' },
             { triggerId: 'tor-trigger', bubbleId: 'tor-bubble', closeBtnId: 'close-tor-bubble' },
@@ -703,7 +713,6 @@
             }
         });
 
-        // --- Unified Fullscreen Modal Logic ---
         const modal = document.getElementById("image-modal");
         const modalImg = document.getElementById("full-image");
         const closeModalBtn = document.querySelector(".close-modal");
@@ -727,18 +736,12 @@
             }
         });
 
-        // --- Page Transition Exit Logic ---
         document.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', function(e) {
                 const target = this.getAttribute('href');
-                
-                // Intercept internal links only, ignore external/anchor/mailto links
                 if (target && !target.startsWith('#') && !target.startsWith('http') && target.indexOf('mailto:') === -1 && target.indexOf('tel:') === -1 && this.getAttribute('target') !== '_blank') {
                     e.preventDefault(); 
-                    
                     document.body.classList.add('page-exit'); 
-                    
-                    // Wait for the CSS animation to finish (400ms) before loading new page
                     setTimeout(() => {
                         window.location.href = target;
                     }, 400); 
